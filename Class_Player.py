@@ -48,6 +48,10 @@ class Player:
         else:
             print(f"{self.name} thinks its his turn!")
             
+    def buy(self):
+        
+        
+            
             
             
         
