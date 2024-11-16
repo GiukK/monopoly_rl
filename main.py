@@ -1,4 +1,4 @@
-from Func_plotboard import plot_board
+#from Func_plotboard import plot_board
 from Class_Board import GameState
 from Class_Player import Player
 

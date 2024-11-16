@@ -1,10 +1,10 @@
 class Tile():
     
-    def __init__(self, pos, price = 100, name = "unknown"):
+    def __init__(self, pos_xy, price = 100, name = "unknown"):
         
         #common to all tiles
         
-        self.pos = pos
+        self.pos_xy = pos_xy
         
         self.name = name
         
@@ -12,7 +12,7 @@ class Tile():
         
         self.price = price
         
-        self.owner = 0
+        self.owner = None
         
         self.owned = False
         

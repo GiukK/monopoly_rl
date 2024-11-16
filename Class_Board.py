@@ -1,5 +1,6 @@
 import random
 from Func_plotboard import plot_board
+from Class_Tile import Tile
 
 class GameState:
     
@@ -10,6 +11,8 @@ class GameState:
         
         #list of player obj
         self.players = players
+        
+        self.current = None
         
         #int : number of players ingame
         self.numplayers = len(players)
@@ -22,6 +25,50 @@ class GameState:
         
         #Bool: if the gamestate is running
         self.running = True
+        
+        #Board set with minimum characteristics, just xy posistion with respect to img
+        self.BOARD = {
+    0: Tile((8.90, 1)),
+    1: Tile((8.10, 1)),
+    2: Tile((7.30, 1)),
+    3: Tile((6.50, 1)),
+    4: Tile((5.70, 1)),
+    5: Tile((4.90, 1)),
+    6: Tile((4.10, 1)),
+    7: Tile((3.30, 1)),
+    8: Tile((2.50, 1)),
+    9: Tile((1.70, 1)),
+    10: Tile((0.90, 1)),
+    11: Tile((0.90, 1.80)),
+    12: Tile((0.90, 2.60)),
+    13: Tile((0.90, 3.40)),
+    14: Tile((0.90, 4.20)),
+    15: Tile((0.90, 5.00)),
+    16: Tile((0.90, 5.80)),
+    17: Tile((0.90, 6.60)),
+    18: Tile((0.90, 7.40)),
+    19: Tile((0.90, 8.20)),
+    20: Tile((0.90, 9.00)),
+    21: Tile((1.70, 9.00)),
+    22: Tile((2.50, 9.00)),
+    23: Tile((3.30, 9.00)),
+    24: Tile((4.10, 9.00)),
+    25: Tile((4.90, 9.00)),
+    26: Tile((5.70, 9.00)),
+    27: Tile((6.50, 9.00)),
+    28: Tile((7.30, 9.00)),
+    29: Tile((8.10, 9.00)),
+    30: Tile((8.90, 9.00)),
+    31: Tile((8.90, 8.20)),
+    32: Tile((8.90, 7.40)),
+    33: Tile((8.90, 6.60)),
+    34: Tile((8.90, 5.80)),
+    35: Tile((8.90, 5.00)),
+    36: Tile((8.90, 4.20)),
+    37: Tile((8.90, 3.40)),
+    38: Tile((8.90, 2.60)),
+    39: Tile((8.90, 1.80)),
+}
         
         #Calls the starting function when initialized
         self.start()
@@ -42,7 +89,7 @@ class GameState:
         
         #Sets the first player on the order list as the current player.
         #current will be used in the gameloop as a placeholder to keep trace of the right player.
-        current = self.players[self.order[0]]
+        self.current = self.players[self.order[0]]
         
         
         #Gameloop
@@ -51,19 +98,19 @@ class GameState:
             print(f"Turn : {self.turn}\n\n")
             
             #Set turn true of the current player
-            current.myturn = True
+            self.current.myturn = True
             
-            print(f"----------------\nIts the turn of {current}\n")
+            print(f"----------------\nIts the turn of {self.current}\n")
             
             
-                #they play .... now its just throw of dice. Random 1-6
-            current.random_turn()
+                #they play ....
+            self.current.random_turn(self)
             
             
             
             #correct squares so that they do not exceed 40, probably inefficient
-            if current.pos >= 40:
-                current.pos = current.pos % 40
+            if self.current.pos >= 40:
+                self.current.pos = self.current.pos % 40
 
             
             #Showcase of Gamestate variables, position, money etc... to be updated
@@ -77,35 +124,60 @@ class GameState:
             #Adding command features such as /back or showing some variables will be helpful in the future.
             #right now the part that shows the board is at the end of the while loop, changes can be done if it is not clear
             
-            print("Press Enter to skip or 's' + Enter to show the board.")
+            print("Press Enter to skip or write 'help'")
+            
+            
+            
+            #Fetch input
             x = input()
-            #----------------------------------------------------------------------------------------------
-
-
-            #The turn has finished: update the important variables
-            #Set current players turn to false
-            current.myturn = False
-            
-            #update number of turn
-            self.turn += 1
-            
-            #update player to next in queue
-            current = self.players[self.order[self.turn % self.numplayers]]
-            
-            
-            #------------------------------------------------------------------------------------------------
-            
-            
             
             #Commands:  just hold Enter to skip turns fast and "s" + Enter to show the current turn played
             
             # "s" = show
             # any = skip turn
             
-            if x == "s":
+            if x == "help":
                 
+                print("The commands currently are:")
+                print("s : to SHOW the current board")
+                print("stats : to see a players stats")
+ 
+            elif x == "s":
+            
                 plot_board(self)
-           
+                
+            elif x == "stats":
+                
+                print("Which player do you want to see?")
+                x = input()
+                
+                for player in self.players:
+                    if x == player.name:
+                        print("-------------------------------")
+                        for tile in player.properties:
+                            print(f"{tile.name} : {tile.price} $")
+                        
+                        print("-------------------------------")
+                        break
+                        
+                    print("No player has that name.")
+                
+
+            #----------------------------------------------------------------------------------------------
+
+
+            #The turn has finished: update the important variables
+            #Set current players turn to false
+            self.current.myturn = False
+            
+            #update number of turn
+            self.turn += 1
+            
+            #update player to next in queue
+            self.current = self.players[self.order[self.turn % self.numplayers]]
+            
+            
+            #------------------------------------------------------------------------------------------------
             
         #out of the gameloop
         print("\n\n------------------------GAME OVER------------------------")
