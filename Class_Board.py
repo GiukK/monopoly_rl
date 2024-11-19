@@ -106,11 +106,6 @@ class GameState:
                 #they play ....
             self.current.random_turn(self)
             
-            
-            
-            #correct squares so that they do not exceed 40, probably inefficient
-            if self.current.pos >= 40:
-                self.current.pos = self.current.pos % 40
 
             
             #Showcase of Gamestate variables, position, money etc... to be updated
@@ -182,7 +177,6 @@ class GameState:
         #out of the gameloop
         print("\n\n------------------------GAME OVER------------------------")
             
-        
         
         
         

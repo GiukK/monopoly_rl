@@ -56,15 +56,54 @@ class Player:
                 self.buy(gamestate)
                 
             self.move()
+            #correct squares so that they do not exceed 40, probably inefficient
+            if self.pos >= 40:
+                self.pos = self.pos % 40
+            
+            
+            
         else:
             print(f"{self.name} thinks its his turn!")
+            
+            
+            
+            #check if player ended up in a owned tile
+        if gamestate.BOARD[self.pos].owned :
+            
+            price = gamestate.BOARD[gamestate.current.pos].price // 2
+            
+            #if player is broke, say it. In the future we will implement an endiing condition
+            if self.money < price :
+                
+                print(f"{self.name} has to pay {gamestate.BOARD[self.pos].owner} but has no money!")
+                
+                gamestate.BOARD[self.pos].owner.money += self.money
+                
+                self.money = 0
+            
+            #if it has money, pay
+            else:
+                
+                print(f"{self.name} has paid {gamestate.BOARD[self.pos].owner} {price}$!")
+                
+                gamestate.BOARD[self.pos].owner.money += price
+                
+                self.money -= price
+                
+            
             
     
     #function that handles buys
     
     def buy(self, gamestate):
         
-        tile = gamestate.BOARD[gamestate.current.pos]
+        tile = gamestate.BOARD[self.pos]
+        
+        if tile.owned:
+            
+            print(f"{self.name} wanted to BUY but the property is owned!")
+            
+            return
         
         if self.money >= tile.price :
             
