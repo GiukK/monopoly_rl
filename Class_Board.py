@@ -146,8 +146,23 @@ class GameState:
                     case "help":
                         print("-------------------------\n")
                         
-                        print("The commands are:\n's' : to show the board\n'stats' : to look at players stats\n\nPress 'Enter' to go to next turn.")
+                        print("The commands are:\n")
+                        print("'s' : to show the board")
+                        print("'stats' : to look at players stats")
+                        print("'order' : to show player order")
+                        print("Press 'Enter' to go to next turn.")
                         
+                        
+                        
+                        print("\n-------------------------\n")
+                    
+                    case "order":
+                        
+                        print("-------------------------")
+                        
+                        for i in self.order:
+                            print(f"{self.players[i].name} ", end = "")
+                            
                         print("\n-------------------------\n")
                         
                     case _:
