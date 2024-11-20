@@ -60,8 +60,6 @@ class Player:
             if self.pos >= 40:
                 self.pos = self.pos % 40
             
-            
-            
         else:
             print(f"{self.name} thinks its his turn!")
             

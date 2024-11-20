@@ -1,5 +1,5 @@
 import random
-from Func_plotboard import plot_board
+from Func_plotboard import plot_board, show_stats
 from Class_Tile import Tile
 
 class GameState:
@@ -121,43 +121,40 @@ class GameState:
             
             print("Press Enter to skip or write 'help'")
             
-            
-            
             #Fetch input
-            x = input()
-            
-            #Commands:  just hold Enter to skip turns fast and "s" + Enter to show the current turn played
-            
-            # "s" = show
-            # any = skip turn
-            
-            if x == "help":
-                
-                print("The commands currently are:")
-                print("s : to SHOW the current board")
-                print("stats : to see a players stats")
- 
-            elif x == "s":
-            
-                plot_board(self)
-                
-            elif x == "stats":
-                
-                print("Which player do you want to see?")
-                x = input()
-                
-                for player in self.players:
-                    if x == player.name:
-                        print("-------------------------------")
-                        for tile in player.properties:
-                            print(f"{tile.name} : {tile.price} $")
-                        
-                        print("-------------------------------")
-                        break
-                        
-                    print("No player has that name.")
-                
 
+            while True:
+                
+                x = input().strip()
+                
+                match x:
+                    
+                    case "":
+                        
+                        break
+                    
+                    case "s":
+                        
+                        print("Showing board...")
+                        
+                        plot_board(self)
+                        
+                    case "stats":
+                        
+                        show_stats(self)
+                        
+                    case "help":
+                        print("-------------------------\n")
+                        
+                        print("The commands are:\n's' : to show the board\n'stats' : to look at players stats\n\nPress 'Enter' to go to next turn.")
+                        
+                        print("\n-------------------------\n")
+                        
+                    case _:
+                        
+                        print(f"There is no command called '{x}', write 'help' to see the available commands")
+                        
+                    
             #----------------------------------------------------------------------------------------------
 
 
