@@ -2,6 +2,8 @@ import random
 from Func_plotboard import plot_board, show_stats
 from Class_Tile import Tile
 
+import time
+
 class GameState:
     
     def __init__(self, players= []):
@@ -17,11 +19,14 @@ class GameState:
         #int : number of players ingame
         self.numplayers = len(players)
         
-        #list of ints, represents the order in which players alternate turns
-        self.order = [x for x in range(0,self.numplayers)]
+        #list of ints, represents the order in which players alternate turns, HANDLES ORDER
+        self.order = [i for i in range(0,self.numplayers)]
         
-        #list of ints: placeholder for board
-        self.squares = [i for i in range(0,40)]
+        random.shuffle(self.order)
+        
+        self.lose_case = 0
+
+        self.index = 0
         
         #Bool: if the gamestate is running
         self.running = True
@@ -78,14 +83,9 @@ class GameState:
         
         #This are just for prettier logs in the command line
         print("------------------------   Game has started   ------------------------\n\n")
-        
-        
-        #Shuffles randomly the order, once shouffled at the start, it will remain the same until the end.
-        #The process of eliminating players and changing order of turns has to be treated carefully in the future.
-        random.shuffle(self.order)
 
         
-        print(f"------------------------   {self.players[self.order[0]]} goes first!   ------------------------\n\n")
+        print(f"------------------------   {self.order[0]} goes first!   ------------------------\n\n")
         
         #Sets the first player on the order list as the current player.
         #current will be used in the gameloop as a placeholder to keep trace of the right player.
@@ -108,18 +108,21 @@ class GameState:
             
 
             
+
+            print()
             #Showcase of Gamestate variables, position, money etc... to be updated
-            for player in self.players:
+            for i in self.order:
                 
-                print(f"{player} is in position : {player.pos}", f"{player} money : {player.money}")
- 
+                player = self.players[i]
+                
+                print(f"{player} money : {player.money}")
             
             #-------------------------------Interacts with user-------------------------------------------
             #This part is basically to control the code while it is running.
             #Adding command features such as /back or showing some variables will be helpful in the future.
             #right now the part that shows the board is at the end of the while loop, changes can be done if it is not clear
             
-            print("Press Enter to skip or write 'help'")
+            print("\nPress Enter to skip or write 'help'")
             
             #Fetch input
 
@@ -161,7 +164,7 @@ class GameState:
                         print("-------------------------")
                         
                         for i in self.order:
-                            print(f"{self.players[i].name} ", end = "")
+                            print(f"{self.players[i]}  ", end = "")
                             
                         print("\n-------------------------\n")
                         
@@ -171,8 +174,26 @@ class GameState:
                         
                     
             #----------------------------------------------------------------------------------------------
-
-
+            
+            #update player to next in queue ---------------- NOT EZ
+            
+            if self.lose_case :
+                
+                self.lose_case = 0
+                
+                #stops the code for a few seconds to let you see that someone lost, this can be changed
+                time.sleep(2)
+                
+                #Last one standing wins
+                if len(self.order) == 1:
+                    
+                    print(f"\n\n{self.players[self.order[0]]} HAS WON!")
+                    
+                    self.running = False
+                
+                continue
+            
+            
             #The turn has finished: update the important variables
             #Set current players turn to false
             self.current.myturn = False
@@ -180,9 +201,9 @@ class GameState:
             #update number of turn
             self.turn += 1
             
-            #update player to next in queue
-            self.current = self.players[self.order[self.turn % self.numplayers]]
+            self.index += 1
             
+            self.current = self.players[self.order[ self.index % self.numplayers]]
             
             #------------------------------------------------------------------------------------------------
             
@@ -206,7 +227,6 @@ class GameState:
         self.players = gamestate.players
         self.numplayers = gamestate.numplayers
         self.order = gamestate.order
-        self.squares = gamestate.squares
         self.running = True
         
             

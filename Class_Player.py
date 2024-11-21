@@ -16,7 +16,7 @@ class Player:
         self.pos = 0
         
         #Money
-        self.money = 1500
+        self.money = 100
         
         #Owned
         self.properties = []
@@ -24,7 +24,7 @@ class Player:
         #Turn
         self.myturn = False
         
-        #Lost
+        #Handles losses
         self.lost = 0
         
         
@@ -64,40 +64,47 @@ class Player:
             #correct squares so that they do not exceed 40, probably inefficient
             if self.pos >= 40:
                 self.pos = self.pos % 40
+            
+            
+            
+            tile = gamestate.BOARD[self.pos]
+            
+            #check if player ended up in a owned tile
+            if tile.owned and tile.owner != self:
+                
+                price = tile.price // 2
+                
+                #if player is broke, say it. In the future we will implement an endiing condition
+                if self.money < price :
+                    
+                    print(f"{self.name} has to pay {gamestate.BOARD[self.pos].owner} but has no money!")
+                    
+                    self.emergency(gamestate,price)
+                    
+                    if self.lost:
+                        
+                        print(f"Turn stopped because {self} lost!")
+                        
+                        return
+                
+                    #if it has money, pay
+                else:
+                    
+                    print(f"{self.name} has paid {gamestate.BOARD[self.pos].owner} {price}$!")
+                    
+                    tile.owner.money += price
+                    
+                    self.money -= price
                 
             #Buys--------------------------------------------
             want_to_buy = random.randint(0, 1)
-                
+                        
             if want_to_buy:
                 self.buy(gamestate)
                 
-            
         else:
             #This is to catch eventual errors in the flow of players
-            print(f"{self.name} thinks its his turn!")
-            
-            
-            
-            #check if player ended up in a owned tile
-        if gamestate.BOARD[self.pos].owned :
-            
-            price = gamestate.BOARD[gamestate.current.pos].price // 2
-            
-            #if player is broke, say it. In the future we will implement an endiing condition
-            if self.money < price :
-                
-                print(f"{self.name} has to pay {gamestate.BOARD[self.pos].owner} but has no money!")
-                
-                self.emergency(gamestate,price)
-            
-            #if it has money, pay
-            else:
-                
-                print(f"{self.name} has paid {gamestate.BOARD[self.pos].owner} {price}$!")
-                
-                gamestate.BOARD[self.pos].owner.money += price
-                
-                self.money -= price
+            print(f"{self.name} thinks its his turn! WRONG!")
                 
             
             
@@ -126,7 +133,7 @@ class Player:
         
             print(f"{self} has bought {tile.name}")
         else:
-            print(f"{self} has no Money to buy!")
+            print(f"{self} would like to buy, but it has no MONEY!")
             
         
         
@@ -144,11 +151,11 @@ class Player:
         
         available = []
         
-        for player in gamestate.players:
+        for i in gamestate.order:
             
-            if player.money >= price:
+            if gamestate.players[i].money >= price:
                 
-                available.append(player)
+                available.append(gamestate.players[i])
                 
         #handle possible errors
         
@@ -158,9 +165,9 @@ class Player:
         
         if len(available) == 0:
             
-            self.lose()
+            print("THERE IS NO ONE TO SELL TO!")
             
-            return
+            return 0
         
         buyer = random.choice(available)
         
@@ -170,6 +177,8 @@ class Player:
         #add tile to buyer 
         buyer.properties.append(tile)
         
+        tile.owner = buyer
+        
         #add money to seller
         self.money += price
         
@@ -177,6 +186,8 @@ class Player:
         buyer.money -= price
         
         print(f"{self} has sold {tile} to {buyer} for {price}$")
+        
+        return 1
     
     
     #this function handles emergencies, when player has to pay buy has no money
@@ -184,37 +195,69 @@ class Player:
     
     def emergency(self, gamestate, price):
         
+        print(f"{self} has to sell its properties!")
+        
         while self.money < price:
+            
+            #sells until it has no properties -> lose
             
             if self.properties == []:
                 
                 self.lose(gamestate)
                 
                 return
+            
+            #tries to sell property
+            
+            else:
                 
-            self.random_sell(gamestate)
+                x = self.random_sell(gamestate)
+            
+                #if the value returned by the selling process is 0, meaning it did not find anyone to sell to, you lose
+            
+                if not x:
+                    
+                    self.lose(gamestate)
+                    
+                    return
             
     
     #handles losses
     def lose(self, gamestate):
         
-        #remove player from game
+        #Ends turn -> Updating the next player is easy -> removes player that has lost ->
+        # -> uses index of next player to fix cycle
         
-        #gamestate.players.remove(self)
+        
+        #Ends turn normally
+        
+        self.myturn = False
+        
+        gamestate.turn += 1
+        
+        gamestate.index += 1
+        
+        gamestate.current = gamestate.players[gamestate.order[ gamestate.index % gamestate.numplayers]]
+        
+        #Handles removal
+        
+        gamestate.numplayers -= 1
+        
+        gamestate.order.remove(gamestate.players.index(self))
+        
+        #handles ordering
+        
+        gamestate.index = gamestate.order.index(gamestate.players.index(gamestate.current))
         
         
-        #to actually remove player from game the code should be changed to handle "next turn"
-        # and to update list of players and lenght of lists and orders...
+        print(f"\n------ {self} HAS LOST ------\n")
         
-        #right now I just make an inner field to handle losses and skip turn if the player has lost
+        
+        gamestate.lose_case = 1
         
         self.lost = 1
         
-        print(f"{self} HAS LOST! ")
-        
-        
-        
-            
+        return
             
         
         

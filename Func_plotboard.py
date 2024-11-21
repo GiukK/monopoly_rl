@@ -46,7 +46,9 @@ def plot_board(gamestate):
     
     
     #Plots each player on the board
-    for player in gamestate.players:
+    for i in gamestate.order:
+        
+        player = gamestate.players[i]
         
         x,y = gamestate.BOARD[player.pos].pos_xy
         
