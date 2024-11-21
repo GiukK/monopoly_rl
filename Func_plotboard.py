@@ -5,6 +5,8 @@ from matplotlib.patches import Circle, Rectangle
 
 import random 
 
+
+#depending on the editor, showing may cause crashes. I suggest using in-line plot or dedicated plot areas in your IDE.
 def plot_board(gamestate):
     
     #Loads image
@@ -38,7 +40,7 @@ def plot_board(gamestate):
         y = y - dim / 2
         
         #plot
-        square = Rectangle((x,y) , dim , dim , linewidth=2, edgecolor= 'white', facecolor= tile.owner.color)
+        square = Rectangle((x,y) , dim , dim , linewidth=2, edgecolor= 'white', facecolor= tile.owner.color, alpha = 0.8)
         ax.add_patch(square)
         
         
@@ -117,13 +119,13 @@ def show_stats(gamestate):
                 
                 print("\n-------------------------")
                 
-                print("\nPress Enter to exit stats mode")
+                print("\nPress Enter to exit stats mode or write the name of another player")
                 
                 
         #print alert if user misswrote
         if alert:
             
-            print("This player does not exist")
+            print("This player does not exist, write a valid player or press Enter to exit stats mode")
                 
             
                 

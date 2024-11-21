@@ -16,7 +16,7 @@ class Player:
         self.pos = 0
         
         #Money
-        self.money = 100
+        self.money = 1500
         
         #Owned
         self.properties = []
@@ -34,7 +34,7 @@ class Player:
 #-----------------------------------------------------        
         
     #just a normal dice roll
-    def dices(self):
+    def dice(self):
         
         res = random.randint(1, 6)
         
@@ -45,7 +45,22 @@ class Player:
     
     #updates pos with the dice roll
     def move(self):
-        self.pos += self.dices()
+        
+        # FROM RULES "If you throw doubles, you move your token as usual, the sum of the
+        # two dice, and are subject to any privileges or penalties pertaining to
+        # the space on which you land. Retaining the dice, throw again and move
+        # your token as before. If you throw doubles three times in succession,
+        # move your token immediately to the space marked "In Jail" (see JAIL). "
+        
+        #We will not implement this thing at the moment, also because there are no effects or jail
+        
+        dice1 = self.dice()
+        
+        dice2 = self.dice()
+        
+        
+        
+        self.pos += dice1 + dice2
         
     
     #MAIN function that handles how players act in their turns
@@ -77,20 +92,35 @@ class Player:
                 #if player is broke, say it. In the future we will implement an endiing condition
                 if self.money < price :
                     
-                    print(f"{self.name} has to pay {gamestate.BOARD[self.pos].owner} but has no money!")
+                    print(f"{self.name} has to pay {tile.owner} {price}$ but has no money!")
                     
                     self.emergency(gamestate,price)
                     
                     if self.lost:
                         
-                        print(f"Turn stopped because {self} lost!")
+                        print(f"{self.name} has paid {tile.owner} {self.money}$!")
+                        
+                        print(f"Turn stopped because {self} lost on position {self.pos}!")
+                        
+                        tile.owner.money += self.money
+                        
+                        self.money = 0
                         
                         return
+                    
+                    else:
+                        
+                        print(f"{self.name} has paid {tile.owner} {price}$!")
+                        
+                        tile.owner.money += price
+                        
+                        self.money -= price
+                        
                 
                     #if it has money, pay
                 else:
                     
-                    print(f"{self.name} has paid {gamestate.BOARD[self.pos].owner} {price}$!")
+                    print(f"{self.name} has paid {tile.owner} {price}$!")
                     
                     tile.owner.money += price
                     
@@ -115,9 +145,17 @@ class Player:
         
         tile = gamestate.BOARD[self.pos]
         
+        #prevents players from buying owned properties
         if tile.owned:
             
             print(f"{self.name} wanted to BUY but the property is owned!")
+            
+            return
+        
+        #prevents players from buying special tiles - TO BE UPDATED
+        if tile.price == 0:
+            
+            print(f"{self.name} wanted to BUY {tile} but it CANNOT BE BOUGHT!")
             
             return
         
